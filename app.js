@@ -3,12 +3,15 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-const mongoose = require("mongoose");
-const config = require("./config/database.js");
+var mongoose = require("mongoose");
+const session = require("express-session");
+
+var config = require("./config/database.js");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
+require("dotenv").config();
 var app = express();
 
 // view engine setup
@@ -20,6 +23,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// using the session by default settings
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+ }))
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
