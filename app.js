@@ -4,12 +4,13 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-const session = require("express-session");
-
+var passport = require('passport');
+var session = require('express-session');
+var sessionConfig = require('./config/sessions');
+``
 var config = require("./config/database.js");
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
 
 require("dotenv").config();
 var app = express();
@@ -24,34 +25,30 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// using the session by default settings
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
- }))
+app.use(session(sessionConfig));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+
+// connecting to the database
+mongoose
+  .connect(config.database)
+  .then(() => {
+    console.log("Connected to database!!!");
+  });
+  
+
+// serving the routes on specified path
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   next(createError(404));
 });
 
-//connecting to the database
-mongoose
-  .connect(config.database, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to database...");
-  });
-
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
@@ -60,5 +57,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+
 
 module.exports = app;
