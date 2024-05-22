@@ -7,6 +7,7 @@
     "start-dev": "nodemon index.js"
   },
   "dependencies": {
+    "connect-mongo": "^5.1.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "dot-env": "^0.0.1",

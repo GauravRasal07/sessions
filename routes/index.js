@@ -6,12 +6,11 @@ var loginRouter = require("./auth");
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
-  res.render('index', { title: 'Application!!!' });
+  res.redirect('/login');
 });
 
 
 router.get('/error', (req, res) => {
-  console.log(req);
   res.render('error');
 })
 

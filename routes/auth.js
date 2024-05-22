@@ -2,11 +2,10 @@ var express = require('express');
 var passport = require('passport');
 var router = express.Router();
 
-const User = require('../models/user');
+const {User, Session} = require('../models');
 
 
 router.get('/register', (req, res, next) => {
-  console.log(req.isAuthenticated());
   res.render('register');
 });
 
@@ -21,7 +20,7 @@ router.post('/register', async(req, res, next) => {
       throw new Error(`Unable to register user!`);
     }
 
-    console.log(`Registered user: ${createdUser}`);
+    console.log(`Registered user: ${createdUser.username}`);
     res.status(200).json(`Successfully registered using ${createdUser.username}, Please login using the creds!`);
   } catch (err) {
     res.status(401).json(err);
@@ -31,7 +30,6 @@ router.post('/register', async(req, res, next) => {
 
 
 router.get('/login', (req, res, next) => {
-  console.log(req)
   res.render('login');
 });
 
@@ -51,12 +49,25 @@ router.post("/login", async(req, res) => {
       return;
     } 
 
+    req.session.userId = authenticatedUser._id;
+    res.set('Set-Cookie', `sessionId=${req.session.id}`);
     res.status(200).redirect('/users');
   } catch (err) {
     console.log(`Error while authenticating user: ${err}`);
     res.redirect('/error', 500,  {message: `Error while authenticating!!!`, error: err});
   } 
-  
 });
+
+router.get('/logout', (req, res) => {
+  // Destroy session
+  req.session.destroy((err) => {
+    if (err) {
+        console.error(err);
+        res.status(500).send('Error logging out');
+    } else {
+        res.send('Logged out');
+    }
+});
+})
 
 module.exports = router;
