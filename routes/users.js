@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const userController = require('../controllers/user');
+const {findUserById} = require('../controllers/user');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -13,7 +13,7 @@ router.get('/list', async(req, res) => {
   try {
     if(req.session && req.session.userId) {
       console.log(`Session found with user id as ${req.session.userId}`);
-      let err, user = await userController.findUserById(req.session.userId);
+      let err, user = await findUserById(req.session.userId);
 
       if (err ) throw err;
 

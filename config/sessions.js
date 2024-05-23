@@ -6,7 +6,8 @@ var hour = 3600000;
 const sessionStore = new MongoStore(
     { 
         mongoUrl: process.env.MONGODB_URI,
-        collection:'sessions'
+        collection:'sessions',
+        stringify: false
     }
 )
 

@@ -3,6 +3,7 @@ var passport = require('passport');
 var router = express.Router();
 
 const {User, Session} = require('../models');
+const {findSessionByUserId, deleteSessionById} = require('../controllers/user');
 
 
 router.get('/register', (req, res, next) => {
@@ -48,6 +49,12 @@ router.post("/login", async(req, res) => {
       res.redirect('/error', 401, {message: `User not registered!!!`});
       return;
     } 
+
+    let err, previousSession = await findSessionByUserId(authenticatedUser._id);
+
+    if(previousSession) {
+      await deleteSessionById(authenticatedUser._id);
+    }
 
     req.session.userId = authenticatedUser._id;
     res.set('Set-Cookie', `sessionId=${req.session.id}`);
