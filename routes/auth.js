@@ -1,12 +1,14 @@
 var express = require('express');
-var passport = require('passport');
 var router = express.Router();
 
-const {User, Session} = require('../models');
+const {User} = require('../models');
 const {findSessionByUserId, deleteSessionById} = require('../controllers/user');
 
 
 router.get('/register', (req, res, next) => {
+  if(req.session && req.session.userId){
+    return res.redirect('/users');
+  }
   res.render('register');
 });
 
@@ -31,6 +33,9 @@ router.post('/register', async(req, res, next) => {
 
 
 router.get('/login', (req, res, next) => {
+  if(req.session && req.session.userId){
+    return res.redirect('/users');
+  }
   res.render('login');
 });
 
@@ -50,7 +55,7 @@ router.post("/login", async(req, res) => {
       return;
     } 
 
-    let err, previousSession = await findSessionByUserId(authenticatedUser._id);
+    let _, previousSession = await findSessionByUserId(authenticatedUser._id);
 
     if(previousSession) {
       await deleteSessionById(authenticatedUser._id);
